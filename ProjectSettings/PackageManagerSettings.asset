@@ -33,6 +33,7 @@ MonoBehaviour:
     - com.cysharp.unitask
     - com.acegikmo.mathfs
     - com.neuecc.unirx
+    - com.vertx.debugging
     m_IsDefault: 0
     m_Capabilities: 0
     m_ConfigSource: 4
