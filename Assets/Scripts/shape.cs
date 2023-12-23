@@ -5,4 +5,5 @@ using UnityEngine;
 
 public class shape : SerializedMonoBehaviour
 {
+	public List<grid3d> members;
 }

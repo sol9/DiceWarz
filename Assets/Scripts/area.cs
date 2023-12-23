@@ -17,7 +17,7 @@ public class area : SerializedMonoBehaviour, IDisposable
     [ReadOnly]
     public List<floor> floors;
 
-    public grid3d unitSize => configs.unitSize;
+    public Vector3 unitSize => configs.unitSize;
     public block blockPrefab => configs.defaultBlockPrefabs;
 
     public bool valid => floors.valid();

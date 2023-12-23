@@ -7,7 +7,7 @@ using UnityEngine;
 public class areaConfigs : SerializedScriptableObject
 {
     [Title("block")]
-    public grid3d unitSize;
+    public Vector3 unitSize;
     
     [AssetsOnly]
     public block defaultBlockPrefabs;

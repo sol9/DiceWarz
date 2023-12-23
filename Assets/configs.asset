@@ -21,9 +21,6 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  unitSize:
-    x: 1
-    y: 1
-    h: 1
+  unitSize: {x: 1, y: 1, z: 1}
   defaultBlockPrefabs: {fileID: 1329741329415925264, guid: 1349fd80c58889b42941738d06c38f63,
     type: 3}

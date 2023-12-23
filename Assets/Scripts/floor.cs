@@ -76,12 +76,12 @@ public class floor : SerializedMonoBehaviour, IDisposable
         {
             var coord = new grid2d(i % size.x, i / size.x);
             var child = cell.makeCell(floor, coord.xyh(height), parent.blockPrefab);
-            child.transform.localPosition = (offset + coord.xyh()) * parent.unitSize;
+            child.transform.localPosition = (offset + coord.xyh()).scale(parent.unitSize);
             return child;
         }).ToList();
 
         floor.transform.parent = parent.gameObject.transform;
-        floor.transform.localPosition = new Vector3{ y = (height + 0.5f) * parent.unitSize.h };
+        floor.transform.localPosition = new Vector3{ y = (height + 0.5f) * parent.unitSize.y };
         return floor;
     }
 }
