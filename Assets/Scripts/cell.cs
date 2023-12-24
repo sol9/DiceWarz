@@ -74,9 +74,11 @@ public class cell : SerializedMonoBehaviour
     public grid2d xy => coord.xy;
     public grid3d xyh => coord;
 
-    public bool hasBlock => placed;
+    public bool valid => parent && parent.valid;
 
-    public bool valid => parent && hasBlock;
+    public areaConfigs configs => valid ? parent.configs : default;
+
+    public bool hasBlock => placed;
 
     public void Dispose()
     {
@@ -92,15 +94,83 @@ public class cell : SerializedMonoBehaviour
         }
     }
 
+    public bool pushBlock(block block)
+    {
+        if (hasBlock)
+            return false;
+
+        if (!block)
+            return false;
+
+        block.onPushed(this);
+        placed = block;
+        return true;
+    }
+
+    public block popBlock()
+    {
+        if (!hasBlock)
+            return null;
+
+        var pop = placed;
+        placed = null;
+
+        pop.onPopped();
+        return pop;
+    }
+
+    [HorizontalGroup("func", Title = "placed Block")]
+    [DisableInPlayMode]
+    [EnableIf("@valid && !hasBlock")]
+    [Button(SdfIconType.PlusSquareFill, "push")]
+    public void createBlock()
+    {
+        if (!valid || hasBlock)
+            return;
+
+        placed = Instantiate(configs.defaultBlockPrefabs, transform);
+        placed.parent = this;
+    }
+
+    [HorizontalGroup("func")]
+    [DisableInPlayMode]
+    [EnableIf("hasBlock")]
+    [Button(SdfIconType.XSquareFill, "pop")]
+    public void deleteBlock()
+    {
+        if (!hasBlock)
+            return;
+
+        placed.Dispose();
+        placed = null;
+    }
+
 #if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (valid && !hasBlock)
+        {
+            Gizmos.color = new Color(1, 1, 1, 0.05f);
+            Gizmos.DrawWireCube(transform.position, configs.unitSize);
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
-        if (Selection.activeGameObject == gameObject)
+        if (valid && Selection.activeGameObject == gameObject)
+        {
             Handles.Label(transform.position, coord.ToString());
+
+            if (!hasBlock)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireCube(transform.position, configs.unitSize);
+            }
+        }
     }
 #endif
 
-    public static cell makeCell(floor parent, grid3d coord, block prefab)
+    public static cell makeCell(floor parent, grid3d coord, bool makeBlock)
     {
         if (!parent)
             return default;
@@ -109,11 +179,8 @@ public class cell : SerializedMonoBehaviour
         cell.parent = parent;
         cell.coord = coord;
 
-        if (prefab)
-        {
-            cell.placed = Instantiate(prefab, cell.transform);
-            cell.placed.parent = cell;
-        }
+        if (makeBlock)
+            cell.createBlock();
         
         cell.transform.parent = parent.transform;
         return cell;

@@ -9,10 +9,6 @@ public class block : SerializedMonoBehaviour, IDisposable
     [ReadOnly, InlineEditor]
     public cell parent;
 
-    public enum state
-    {
-    }
-
     public bool isPlaced => parent != null;
 
     public grid3d coord => isPlaced ? parent.coord : default;
@@ -25,5 +21,17 @@ public class block : SerializedMonoBehaviour, IDisposable
             Destroy(gameObject);
         else
             DestroyImmediate(gameObject);
+    }
+
+    public void onPushed(cell where)
+    {
+        transform.SetParent(parent.transform, false);
+        parent = where;
+    }
+
+    public void onPopped()
+    {
+        transform.parent = null;
+        parent = null;
     }
 }

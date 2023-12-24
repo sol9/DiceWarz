@@ -21,6 +21,12 @@ public class floor : SerializedMonoBehaviour, IDisposable
     [ReadOnly]
     public List<cell> cells;
 
+    public bool valid => parent && parent.valid
+        && parent.size.xy == size
+        && cells.valid() && cells.Count == count;
+
+    public areaConfigs configs => valid ? parent.configs : default;
+
     public int count => size.x * size.y;
 
     public cell this[int x, int y]
@@ -31,8 +37,6 @@ public class floor : SerializedMonoBehaviour, IDisposable
             return valid && cells.valid(i) ? cells[i] : default;
         }
     }
-
-    public bool valid => parent && cells.valid() && cells.Count == count;
 
     public void Dispose()
     {
@@ -52,12 +56,17 @@ public class floor : SerializedMonoBehaviour, IDisposable
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        if (Selection.activeGameObject == gameObject)
+        if (valid && Selection.activeGameObject == gameObject)
+        {
             Handles.Label(transform.position, height.ToString());
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(transform.position, size.xyh(1) * configs.unitSize);
+        }
     }
 #endif
 
-    public static floor makeFloor(area parent, grid2d size, int height)
+    public static floor makeFloor(area parent, grid2d size, int height, bool makeBlock)
     {
         if (!parent)
             return default;
@@ -75,7 +84,7 @@ public class floor : SerializedMonoBehaviour, IDisposable
         floor.cells = Enumerable.Range(0, count).Select(i =>
         {
             var coord = new grid2d(i % size.x, i / size.x);
-            var child = cell.makeCell(floor, coord.xyh(height), parent.blockPrefab);
+            var child = cell.makeCell(floor, coord.xyh(height), makeBlock);
             child.transform.localPosition = (offset + coord.xyh()).scale(parent.unitSize);
             return child;
         }).ToList();
